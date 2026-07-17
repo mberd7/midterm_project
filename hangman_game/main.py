@@ -3,12 +3,14 @@ import wordlist
 
 
 def new_format(ch, real_word, hidden_format ) -> str:
-   final_format = hidden_format
-   i = -1
-   for _ in real_word:
-      i +=1
-      if _ ==  ch:
-         final_format[i] == ch
+   final_format = ''
+   for index in range(len(real_word)):
+      if real_word[index] == ch:
+         final_format += f'{ch}'
+      else:
+         final_format += hidden_format[index]
+         
+      
 
    return final_format
          
@@ -22,7 +24,7 @@ lives = 6 # სისცოცხლის რაოდენობა
 hidden_word = random.choice(wordlist.word_list) #ირჩევს გამოსაცნობ სიტყვას
 
 print(hidden_word)
-hidden = '__ ' * len(hidden_word)
+hidden = '*' * len(hidden_word)
 
 while(True):
     print(hidden)
