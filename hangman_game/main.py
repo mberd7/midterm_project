@@ -1,6 +1,8 @@
 import random
 import wordlist
 
+#ვამოწმებ თუ დაუკავშირდა მართლა გითჰაბს
+
 
 def new_format(ch, real_word, hidden_format ) -> str:
    final_format = ''
