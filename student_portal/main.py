@@ -1,3 +1,5 @@
+import json
+import os
 class Student: 
     
     #სტუდენტის პროგრამის ინიციალიზაცია ხდება
@@ -57,6 +59,19 @@ class Student:
             raise ValueError("შეფასება არ არის ვალიდური")
         self._grade = grade
 
+#სტუდენტის ობიექტს გარდაქმნის dict-ად, რომ JSON-ში შეინახოს
+    def to_dict(self):
+        return {
+            "name": self._name,
+            "roll_number": self._roll_number,
+            "grade": self._grade
+        }
+
+   
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data["name"], data["roll_number"], data["grade"])
+
 #როდესაც ობიექტის მონაცემების დაბეჭვდა გვენდომება, ამ სახით დაიბეჭდება    
     def __str__(self):
         return f"სახელი: {self._name} | სიის ნომერი: {self._roll_number} | შეფასება: {self._grade}"
@@ -64,8 +79,33 @@ class Student:
 
 class StudentManagementSystem:
 
+    FILENAME = "students.json"
+
     def __init__(self):
-        self.students = []  #იქმნება სია, რომელშიც სტუდენტების მონაცემები შეინახება
+        self.students = []
+        self.load_from_file()  #პროგრამის დაწყებისთანავე იტვირთება შენახული მონაცემები
+
+    #ინახავს ყველა სტუდენტს JSON ფაილში
+    def save_to_file(self):
+        try:
+            data = [student.to_dict() for student in self.students]
+            with open(self.FILENAME, "w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+        except IOError as error:
+            print("შეცდომა ფაილში ჩაწერისას:", error)
+
+    #ტვირთავს სტუდენტებს JSON ფაილიდან, თუ ის არსებობს
+    def load_from_file(self):
+        if not os.path.exists(self.FILENAME):
+            return  #პირველი გაშვებისას ფაილი შეიძლება არ არსებობდეს
+
+        try:
+            with open(self.FILENAME, "r", encoding="utf-8") as file:
+                data = json.load(file)
+                self.students = [Student.from_dict(item) for item in data]
+        except (IOError, json.JSONDecodeError) as error:
+            print("შეცდომა ფაილის წაკითხვისას:", error)
+            self.students = []
    
    #
    #მომდევნო სამი ფუნქციით მოწმდება შესული მონაცემების ვალიდაცია, რეალურად ზუსტად იგივე რამეს აკეთებს
@@ -111,16 +151,14 @@ class StudentManagementSystem:
 #ეს ფუქნცია პასუხისმგებელია, რომ დაამატოს სტუდენტი
     def add_new_student(self):
          roll_number = self.get_valid_number()
-        #აუცილებელია შეამოწმოს არსებობს თუარა ეს სტუდენტი სიაში, თუ არსებობს, მაშინ არ უნდა დაემატოს სტუდენტი
-        #სისტემასი
          if self.find_student(roll_number):
              print("ამ სიის ნომრით სტუდენტი უკვე არსებობს")
              return
-         name =self.get_valid_name()
+         name = self.get_valid_name()
          grade = self.get_valid_grade()
-         #იქმნება ობიექტი ამ მონაცემებით
          student = Student(name, roll_number, grade)
-         self.students.append(student) #ინახება სიაში
+         self.students.append(student)
+         self.save_to_file()  
 
     #ეს ფუნქცია პასუხისმგებელია, რომ ყველა სტუდენტი აჩვენოს
     def show_all_students(self):
@@ -164,6 +202,7 @@ class StudentManagementSystem:
 
         if student:
             self.students.remove(student)
+            self.save_to_file()
             print("სტუდენტის მონაცემები წაიშალა სისტემიდან.")
 
         else:
@@ -182,6 +221,7 @@ class StudentManagementSystem:
         
         new_grade = self.get_valid_grade()
         student.grade = new_grade
+        self.save_to_file()
 
 
 #კონსოლის ინტერაქციულობაზეა პასუხისმგებელი
