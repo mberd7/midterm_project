@@ -35,13 +35,14 @@ class Student:
     
     @roll_number.setter
     def roll_number(self, roll_number):
-        if not roll_number or not str(roll_number).strip():
-            raise ValueError("აუცილებელია, სიის ნომრის შეყვანა")
+        try:
+            val = int(roll_number)
+            if val <= 0:
+                raise ValueError("სიის ნომერი უნდა იყოს დადებითი რიცხვი!")
+            self._roll_number = val
+        except (ValueError, TypeError):
+            raise ValueError("ნომერში უნდა შედიოდეს მხოლოდ რიცხვები.")
         
-        if not roll_number.strip().isdigit():
-            raise ValueError("ნომერში უნდა შედიოდეს მხოლოდ რიცხვები, გამოტოვებების გარეშე!")
-        
-        self._roll_number = roll_number
 
 
 #შეფასების გეთერი და სეთერი
@@ -77,7 +78,10 @@ class StudentManagementSystem:
             try:
                 if not roll_number or not roll_number.isdigit():
                     raise ValueError("ნომერი უნდა შედგებოდეს მხოლოდ რიცხვებით.")
-                return roll_number
+                
+                if int(roll_number) <= 0:
+                    raise ValueError("სიის ნომერი უნდა იყოს დადებითი რიცხვი")
+                return int(roll_number)
             except ValueError as error:
                 print("შეცდომა:", error,  "- ცადე ხელთავიდან.")
 
@@ -95,7 +99,7 @@ class StudentManagementSystem:
 
     def get_valid_grade(self):
         while True:
-            grade = input("შეიყვანეთ ნიშანი: ").strip()
+            grade = input("შეიყვანეთ ნიშანი: ").strip().upper()
             try:
                  if grade not in {"A", "B", "C", "D", "E", "F"}:
                   raise ValueError("შეფასება არ არის ვალიდური")
