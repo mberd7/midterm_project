@@ -1,32 +1,33 @@
 class Student: 
     
+    #სტუდენტის პროგრამის ინიციალიზაცია ხდება
     def __init__(self, name,roll_number, grade):
         self.name = name
         self.roll_number = roll_number
         self.grade = grade
 
 
-
+#სახელის გეთერი და სეთერი
     @property
     def name(self):
         return self._name
-    
 
-
-    
+    #აუცილებელია რომ შემოწმდეს, სახელი ცარიელი არის თუარა და ასევე ასოებისგან
+    #თუ შედგება
     @name.setter
     def name(self, name):  
          
         if not name or not str(name).strip():
             raise ValueError("აუცილებელია სახელის შეყვანა")
         
-        if not all(word.isalpha() for word in name.strip().split()):
+        if not all(word.isalpha() for word in name.strip().split()): #თუ სახელში რამდენიმე სიტყვა 
+            #შედის მაშინ მათ ანაწევრებს და ისე ამოწმებს
             raise ValueError("სახელში აუცილებლად უნდა იყოს ასოები.")
 
         self._name = name.strip()
 
 
-
+#რიგის ნომრის, სეთერი და გეთერი
     @property
     def roll_number(self):
         return self._roll_number
@@ -37,22 +38,25 @@ class Student:
         if not roll_number or not str(roll_number).strip():
             raise ValueError("აუცილებელია, სიის ნომრის შეყვანა")
         
-        if not all(num.isnumeric() for num in roll_number.strip().split()):
-            raise ValueError("ნომერში უნდა შედიოდეს მხოლოდ რიცხვები!")
+        if not roll_number.strip().isdigit():
+            raise ValueError("ნომერში უნდა შედიოდეს მხოლოდ რიცხვები, გამოტოვებების გარეშე!")
         
-
         self._roll_number = roll_number
 
+
+#შეფასების გეთერი და სეთერი
     @property
     def grade(self):
         return self._grade
     
+#შეფასება აუცილებლად უნდა იყოს "A", "B", "C", "D", "E" ან "F"
     @grade.setter
     def grade(self,grade):
         if grade not in {"A", "B", "C", "D", "E", "F"}:
             raise ValueError("შეფასება არ არის ვალიდური")
         self._grade = grade
-    
+
+#როდესაც ობიექტის მონაცემების დაბეჭვდა გვენდომება, ამ სახით დაიბეჭდება    
     def __str__(self):
         return f"სახელი: {self._name} | სიის ნომერი: {self._roll_number} | შეფასება: {self._grade}"
 
@@ -60,8 +64,22 @@ class Student:
 class StudentManagementSystem:
 
     def __init__(self):
-        self.students = []  
+        self.students = []  #იქმნება სია, რომელშიც სტუდენტების მონაცემები შეინახება
    
+   #
+   #მომდევნო სამი ფუნქციით მოწმდება შესული მონაცემების ვალიდაცია, რეალურად ზუსტად იგივე რამეს აკეთებს
+   #რასაც სეთერი, თუმცა ასეთი ფორმატით პროგრამა უფრო ინტერაქციულია, რადგან შეცდომის შემთხვევაში პროგრამა
+   #არ წყვეტს მუშაობას, არამედ მომხმარებელს აძლევს საშუალეას რომ ხელთავიდან ცადოს
+   #
+    def get_valid_number(self):
+        while True:
+            roll_number = input("სიის ნომერი: ").strip()
+            try:
+                if not roll_number or not roll_number.isdigit():
+                    raise ValueError("ნომერი უნდა შედგებოდეს მხოლოდ რიცხვებით.")
+                return roll_number
+            except ValueError as error:
+                print("შეცდომა:", error,  "- ცადე ხელთავიდან.")
 
 
     def get_valid_name(self):
@@ -74,15 +92,6 @@ class StudentManagementSystem:
             except ValueError as error:
                 print("შეცდომა:", error,  "- ცადე ხელთავიდან.")
 
-    def get_valid_number(self):
-        while True:
-            roll_number = input("სიის ნომერი: ").strip()
-            try:
-                if not roll_number or not all(num.isnumeric() for num in roll_number.split()):
-                    raise ValueError("ნომერი უნდა შედგებოდეს მხოლოდ რიცხვებით.")
-                return roll_number
-            except ValueError as error:
-                print("შეცდომა:", error,  "- ცადე ხელთავიდან.")
 
     def get_valid_grade(self):
         while True:
@@ -94,31 +103,33 @@ class StudentManagementSystem:
             except ValueError as error:
                  print("შეცდომა:", error,  "- ცადე ხელთავიდან.")
 
-    def add_new_student(self):
-         roll_number = self.get_valid_number().strip()
-         name =self.get_valid_name().strip()
 
+#ეს ფუქნცია პასუხისმგებელია, რომ დაამატოს სტუდენტი
+    def add_new_student(self):
+         roll_number = self.get_valid_number()
+        #აუცილებელია შეამოწმოს არსებობს თუარა ეს სტუდენტი სიაში, თუ არსებობს, მაშინ არ უნდა დაემატოს სტუდენტი
+        #სისტემასი
          if self.find_student(roll_number):
              print("ამ სიის ნომრით სტუდენტი უკვე არსებობს")
              return
-         grade = self.get_valid_grade(). strip()
-
+         name =self.get_valid_name()
+         grade = self.get_valid_grade()
+         #იქმნება ობიექტი ამ მონაცემებით
          student = Student(name, roll_number, grade)
-         self.students.append(student)
+         self.students.append(student) #ინახება სიაში
 
-
+    #ეს ფუნქცია პასუხისმგებელია, რომ ყველა სტუდენტი აჩვენოს
     def show_all_students(self):
         print("\n--- სტუდენტების სია ---")
         if not self.students:
             print("სისტემაში სტუდენტები არ არიან დამატებულები")
-
             return
 
-        for i, student in enumerate(self.students, start = 1):
-            print(f"{i}, {student}")
+        for i, student in enumerate(self.students, start = 1): #იტირებად ობიექტს(სტუდენტთა სიას) გადაყვება და გვიბეჭდავს
+            print(f"{i}. {student}")
 
         
-
+   #პასუხისმგებელია, რომ იპოვოს სტუდენტი ნომრის მიხედვით
     def find_student(self, roll_number):
         for student in self.students:
             if student.roll_number == roll_number:
@@ -129,21 +140,22 @@ class StudentManagementSystem:
 
     def search_student(self):
         print("\n ---სტუდენტის ძებნა ნომრის მიხედვით ---")
-        
-        roll_number = input("სიის ნომერი: ").strip()
+
+    #იღებს შესაბმის რიცხვსა და მის მიხედვით ეძებს სტუდენტს    
+        roll_number = self.get_valid_number()
         student = self.find_student(roll_number)
 
-        if student:
+        if student: #ამოწმებს მსგავსი სტუდენტი არსებობს თუარა
             print("სტუდენტი მოიძებნა: ")
             print(student)
-
         else:
             print("სტუდენტი მითითებული ნომრით არ მოიძებნება.")
 
+   #შლის სტუდენტს სიიდან, მისი ნომრის მიხედვით
     def delete_student(self):
         print("\n ---სტუდენტის წაშლა ნომრის მიხედვით ---")
         
-        roll_number = input("სიის ნომერი: ").strip()
+        roll_number = self.get_valid_number()
         student = self.find_student(roll_number)
 
         if student:
@@ -154,21 +166,21 @@ class StudentManagementSystem:
             print("სტუდენტი მითითებული ნომრით არ მოიძებნება.")
 
 
+#ცვლისს ტუდენტის ნიშანს.
     def change_grade(self):
         print("\n --- მოსწავლის შეფასების განახლება ---")
-        roll_number = input("სიის ნომერი: ").strip()
+        roll_number = self.get_valid_number()
         student = self.find_student(roll_number)
 
         if not student:
             print("ასეთი სტუდენტი არ არსებობს")
-
             return
         
-        new_grade = input("შეიყვანეთ შეფასება: ")
+        new_grade = self.get_valid_grade()
         student.grade = new_grade
 
 
-
+#კონსოლის ინტერაქციულობაზეა პასუხისმგებელი
     def run_the_system(self):
      while True:
            print("\n ==== სტუდენტის მართვის სისტემბა ====")
@@ -204,6 +216,6 @@ class StudentManagementSystem:
 
 
 if __name__ == "__main__":
-    system = StudentManagementSystem()
+    system = StudentManagementSystem() # პირველი ეს ბრძანება გაეშვება
     system.run_the_system()
     
