@@ -37,7 +37,7 @@ def main():
     print(f"გამოსაცნობი სიტყვა: {hidden}")
     print(f"გამოყენებული ასოები: {', '.join(guessed_chars)}")
 
-    print(hidden_word)
+    
     
     guessed_char = input("შეიყვანეთ სავარაუდო ასო: ").lower() #პატარა ასოებზე გადაგვყავს შეცდომის
     #ასარიდებლად
